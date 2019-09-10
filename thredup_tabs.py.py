@@ -13,16 +13,39 @@ from bs4 import BeautifulSoup
 # Set the URL that you want to webscrape from
 url = 'https://www.thredup.com/products/petite?chars_sleeve_length=sleeveless&department_tags=petite&search_tags=women-tops%2Cwomen-tops-blouses&sizing_id=750%2C755&skip_equivalents=true&sort=Newest+First&state=listed'
 
-
 # Connect to URL
 response = requests.get(url)
 
 
 # Represents the document as a nested data structure, much nicer and systematic to look at
 soup = BeautifulSoup(response.text, "html.parser") # <class 'bs4.BeautifulSoup'>
-print(type(soup))
-# print(soup.prettify())
-# class 'str'
+# print(soup.prettify()) # class 'str'
+
+
+
+# for link in soup.find_all('a'):
+#     link.get('href')
+#     print(type(link)) # <class 'bs4.element.Tag'>
+
+
+
+for i in range(1,):
+	one_a_tag = soup.findAll('a')[i] # find all the 'a' tags
+	link = one_a_tag['href'] # pull all 'href' data within 'a' tags
+	list_link = list(link)
+	download_url = 'https://www.thredup.com/' + link # combine the links to pull data from
+	print(download_url)
+# download_url = 'https://www.thredup.com/' + link # combine the links to pull data from
+
+
+# Starting from line 389 (in increments of 3), open each link in a new tab
+
+# Unless it contains the word "polyester" in the description
+
+# Discription of item: html code of line ______ (fabric line)
+
+
+
 
 
 
