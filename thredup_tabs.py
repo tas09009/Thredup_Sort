@@ -1,16 +1,15 @@
-# import webbrowser
-# webbrowser.open('https://www.thredup.com/')
-import requests, urllib.request, time, re, pprint, sys
-from bs4 import BeautifulSoup
 
 # OBJECTIVE
 # Download NY MTA turnstile data (text files) to local drive.
 # Example of data file: <a href="data/nyct/turnstile/turnstile_190831.txt">Saturday, August 31, 2019</a>
 
+import requests, urllib.request, time, re, pprint, sys, webbrowser
+from bs4 import BeautifulSoup
+
+
 
 # Set the URL that you want to webscrape from
-url = 'https://www.thredup.com/products/petite?chars_sleeve_length=sleeveless&department_tags=petite&search_tags=women-tops%2Cwomen-tops-blouses&sizing_id=750%2C755&skip_equivalents=true&sort=Newest+First&state=listed'
-
+url = 'https://www.thredup.com/products/petite?chars_sleeve_length=short+sleeve&department_tags=petite&search_tags=women-tops%2Cwomen-tops-button-down-shirts&sizing_id=750%2C755%2C756%2C765&skip_equivalents=true&state=listed'
 
 # Connect to URL
 response = requests.get(url)
@@ -21,26 +20,77 @@ soup = BeautifulSoup(response.text, "html.parser") # <class 'bs4.BeautifulSoup'>
 # print(soup.prettify()) # class 'str'
 
 
+list_link = []
 
-product = soup.find_all(attrs={"class": "item-card-top"})[0]
-# [<div data-foo="value">foo!</div>]
+for i in range(6,8):
+
+	item_attribute = soup.find_all(attrs={"class": "item-card-top"})[i]
+
+# print(item_attribute.prettify()) # class 'bs4.element.Tag'
+# print(type(item_attribute)) # class 'bs4.element.ResultSet'
 
 
-# print(product.prettify()) # class 'bs4.element.Tag'
-# print(type(product)) # class 'bs4.element.ResultSet'
+	# find the 1st 'a' tag
+	product = item_attribute.find('a')
 
-one_a_tag = product.find_all('a') # find all the 'a' tags
-link = one_a_tag['href'] # pull all 'href' data within 'a' tags
+	# pull all 'href' data within 'a' tags (there is only 1)
+	link = product['href']
+	
+	# combine the links to pull data from
+	download_url = 'https://www.thredup.com' + link 
 
-print(one_a_tag)
+	print(download_url)	
+
+
+	list_link.append(download_url)
+
+print(list_link)
+
+for i in list_link:
+	webbrowser.open_new(i)
+	time.sleep(2) # pause the code for 1 second
+
+# Everything up until this point pulls out links for each item in a thredup category
+
+
+
+
+
+# ------------------------------------------------------------------------------------------------------
+
+# Item page with materials description
+
+
+
+# Set the URL that you want to webscrape from
+url = download_url
+
+# Connect to URL
+response = requests.get(url)
+
+# Represents the document as a nested data structure, much nicer and systematic to look at
+soup = BeautifulSoup(response.text, "html.parser") # <class 'bs4.BeautifulSoup'>
+
+# Search for polyester through the div tags
+des_attr = soup.find(attrs={"class": "item-details-detail item-details-materials"}) # print(description2) # class 'bs4.element.ResultSet'
+des_text = des_attr.get_text()
+
+# If "polyester" comes up in the materials description:
+# if des_text.find('polyester'):
+# 	print('polyester')
+# else:
+# 	print('0')
+
+
+
+
+
+# description1 = soup.select('div[class="item-details-detail item-details-materials"]') # <class 'list'>
+# description2 = description1.select('strong')
 
 
 # item = product.select("div > href")
 # print(item)
-
-
-
-
 
 
 # testing = soup.find_all("div")[0]
@@ -82,12 +132,6 @@ print(one_a_tag)
 
 # one_a_tag = soup.findAll('a') # find all the 'a' tags
 # class 'bs4.element.ResultSet'
-
-
-
-
-
-
 
 
 
