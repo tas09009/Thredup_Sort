@@ -1,85 +1,145 @@
 
 # OBJECTIVE
-# Download NY MTA turnstile data (text files) to local drive.
-# Example of data file: <a href="data/nyct/turnstile/turnstile_190831.txt">Saturday, August 31, 2019</a>
+# Filter out clothing items (thredup.com) by removing items with descriptions: "polyester" or "Fabric details not available"
 
-import requests, urllib.request, time, re, pprint, sys, webbrowser
+import requests, time, re, pprint, sys, webbrowser
 from bs4 import BeautifulSoup
-
-
+from selenium import webdriver
 
 # Set the URL that you want to webscrape from
-url = 'https://www.thredup.com/products/petite?chars_sleeve_length=short+sleeve&department_tags=petite&search_tags=women-tops%2Cwomen-tops-button-down-shirts&sizing_id=750%2C755%2C756%2C765&skip_equivalents=true&state=listed'
+url = 'https://www.thredup.com/products/petite?chars_sleeve_length=sleeveless&department_tags=petite&search_tags=women-tops%2Cwomen-tops-blouses&sizing_id=750%2C755&skip_equivalents=true&sort=Newest+First&state=listed'
 
 # Connect to URL
 response = requests.get(url)
 
-
 # Represents the document as a nested data structure, much nicer and systematic to look at
-soup = BeautifulSoup(response.text, "html.parser") # <class 'bs4.BeautifulSoup'>
-# print(soup.prettify()) # class 'str'
+soup = BeautifulSoup(response.text, "html.parser") # <class 'bs4.BeautifulSoup'> # print(soup.prettify()) # class 'str'
 
+
+# -----------------------------------------------------------------------------------------------
+# DEF: pulls out links for each item in a thredup category
 
 list_link = []
 
-for i in range(6,8):
+def find_link(start,stop):
 
-	item_attribute = soup.find_all(attrs={"class": "item-card-top"})[i]
+	for i in range(start,stop):
 
-# print(item_attribute.prettify()) # class 'bs4.element.Tag'
-# print(type(item_attribute)) # class 'bs4.element.ResultSet'
+		# Find all attibutes with "item-card-top" (there will be 1 for each clothing item)
+		item_attribute = soup.find_all(attrs={"class": "item-card-top"})[i] # print(type(item_attribute)) # class 'bs4.element.ResultSet'
+		
+		# find the 1st 'a' tag
+		product = item_attribute.find('a')
 
+		# pull all 'href' data within 'a' tags (there is only 1)
+		link = product['href']
+		
+		# combine the links to pull data from
+		download_url = 'https://www.thredup.com' + link 
 
-	# find the 1st 'a' tag
-	product = item_attribute.find('a')
+		list_link.append(download_url)
 
-	# pull all 'href' data within 'a' tags (there is only 1)
-	link = product['href']
+	return list_link # reference for next function
+
+list_link = find_link(9,13)
 	
-	# combine the links to pull data from
-	download_url = 'https://www.thredup.com' + link 
-
-	print(download_url)	
-
-
-	list_link.append(download_url)
-
-print(list_link)
-
-for i in list_link:
-	webbrowser.open_new(i)
-	time.sleep(2) # pause the code for 1 second
-
-# Everything up until this point pulls out links for each item in a thredup category
-
-
-
-
-
+	
 # ------------------------------------------------------------------------------------------------------
-
-# Item page with materials description
-
+# DEF: loop through each item in list and pull link if it doesn't contain the "banned" words
 
 
-# Set the URL that you want to webscrape from
-url = download_url
+def open_link(list_link):
+	
+	for i in range(len(list_link)): # from 0 to length of list
 
-# Connect to URL
-response = requests.get(url)
+		url1 = list_link[i]
 
-# Represents the document as a nested data structure, much nicer and systematic to look at
-soup = BeautifulSoup(response.text, "html.parser") # <class 'bs4.BeautifulSoup'>
+		response1 = requests.get(url1)
 
-# Search for polyester through the div tags
-des_attr = soup.find(attrs={"class": "item-details-detail item-details-materials"}) # print(description2) # class 'bs4.element.ResultSet'
-des_text = des_attr.get_text()
+		# Represents the document as a nested data structure, much nicer and systematic to look at
+		soup1 = BeautifulSoup(response1.text, "html.parser") # <class 'bs4.BeautifulSoup'>
 
-# If "polyester" comes up in the materials description:
+		# Search for polyester throughout the div tags
+		des_attr = soup1.find(attrs={"class": "item-details-detail item-details-materials"}) # print(description2) # class 'bs4.element.ResultSet'
+		des_text = des_attr.get_text() # class = string
+
+		# If it contains the "banned" words, print them out. If not, open new tab
+		if (des_text.find('Polyester') != -1): 
+			print ('Polyester') 
+		elif (des_text.find('Fabric details not available') != -1):
+			print ('Fabric details not available')
+		else: 
+			webbrowser.open_new(url1)
+			time.sleep(3) # pause the code for 3 seconds
+
+open_link(list_link)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # if des_text.find('polyester'):
 # 	print('polyester')
 # else:
-# 	print('0')
+# 	open_link()
+
+# def open_link():
+# 	webbrowser.open_new(response1)
+# 	time.sleep(2) # pause the code for 1 second
+
+
+
+# Item page with materials description
+# def omit():
+# list_link1 = []
+
+# pulls out links for each item in a thredup category
+
+
+# for i in list_link:
+# # # Set the URL that you want to webscrape from
+# # 	url_omit = list_link[i]
+# # 	# print(url_omit)
+
+# 	# Connect to URL
+# 	response1 = requests.get(list_link[i])
+
+# 	# Represents the document as a nested data structure, much nicer and systematic to look at
+# 	soup = BeautifulSoup(response1.text, "html.parser") # <class 'bs4.BeautifulSoup'>
+
+# 	# Search for polyester through the div tags
+# 	for i in list_link:
+
+# 		des_attr = soup.find(attrs={"class": "item-details-detail item-details-materials"})[i] # print(description2) # class 'bs4.element.ResultSet'
+# 		des_text = des_attr.get_text()
+
+# 		if des_text.find('polyester'):
+# 			print('polyester')
+# 		else:
+# 			open_link()
+
+
+
+# # def open_link():
+# for i in list_link:
+# 	webbrowser.open_new(i)
+# 	time.sleep(3) # pause the code for 1 second
+
+
+# find_link()
+# omit()
+# open_link()
+
+
 
 
 
