@@ -1,4 +1,4 @@
-# thredup_sort
+# Thredup_Sort
 
 Thredup is an online consignment store with thousands of options but their filtering system could be better. Due to environmental reasons, I only purchase clothing made of natural materials (wool, cotton, silk, etc.) and avoid polyester and any clothing where the fabric content is unknown.
 
