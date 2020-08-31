@@ -1,7 +1,7 @@
 # Thredup_Sort
 
 **8/18/2020 Update:**
-**This project has migrated and merged with a larger project called "Thredup_database". Please check out that repository instead**
+**This project has migrated and merged with a larger project called "thredup-scraper-api". Please check out that repository instead**
 
 
 Thredup is an online consignment store with thousands of options but their filtering system could be better. Due to environmental reasons, I only purchase clothing made of natural materials (wool, cotton, silk, etc.) and avoid polyester and any clothing where the fabric content is unknown.
